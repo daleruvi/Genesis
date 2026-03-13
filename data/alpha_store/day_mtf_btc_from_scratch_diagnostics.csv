@@ -1,0 +1,16 @@
+metric,count,ratio
+rows_total,8310,1.0
+daily_long,3744,0.4505415162454874
+daily_short,3744,0.4505415162454874
+zone_long,0,0.0
+zone_short,0,0.0
+daily_long_and_zone_long,0,0.0
+daily_short_and_zone_short,0,0.0
+daily_long_and_zone_long_recent,0,0.0
+daily_short_and_zone_short_recent,0,0.0
+m5_entry_long,1455,0.17509025270758122
+m5_entry_short,1458,0.17545126353790613
+final_long_candidates_raw,0,0.0
+final_short_candidates_raw,0,0.0
+quality_long_candidates,0,0.0
+quality_short_candidates,0,0.0

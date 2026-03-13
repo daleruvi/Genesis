@@ -1,0 +1,309 @@
+# GENESIS Quant Trading Platform
+
+## Overview
+
+**GENESIS** es una base de investigacion cuantitativa para mercados **crypto**. La tesis del proyecto es construir una **Alpha Factory**: tomar datos de mercado, transformarlos en features, generar multiples senales cuantitativas y evaluar cuales tienen valor predictivo.
+
+El repositorio esta organizado como paquete Python con:
+
+- `src/genesis/` para el codigo de aplicacion
+- `scripts/` para entrypoints ejecutables
+- `data/` para artefactos y datasets
+- `tests/` para validaciones basicas
+
+## Estado actual
+
+### Implementado hoy
+
+- ingesta de OHLCV desde BingX
+- persistencia de datasets en parquet
+- feature engineering basico
+- generacion automatica de alphas
+- evaluacion simple de alphas
+- experimento de backtesting con Backtrader
+- integracion privada con BingX
+- soporte de demo trading y Virtual USDT
+
+### Planteado pero aun incompleto
+
+- `ml/`
+- `llm/`
+- `portfolio/`
+- `execution/`
+- `backtest/` como motor modular real
+
+## Arquitectura actual del repo
+
+```text
+pyproject.toml
+README
+.env.example
+
+src/
+  genesis/
+    config/
+    data/
+      providers/
+    features/
+    alpha/
+    ml/
+    llm/
+    portfolio/
+    execution/
+    backtest/
+    utils/
+
+scripts/
+  check_bingx_connection.py
+  check_bingx_demo.py
+  check_bingx_demo_order.py
+  check_bingx_demo_cycle.py
+  open_bingx_demo_position.py
+  close_bingx_demo_positions.py
+  run_demo_trading_loop.py
+  run_data_pipeline.py
+  run_feature_pipeline.py
+  run_alpha_generation.py
+  run_alpha_pipeline.py
+  run_backtest.py
+
+tests/
+  test_data/
+  test_features/
+  test_alpha/
+  test_portfolio/
+
+data/
+  raw/
+  processed/
+  feature_store/
+  alpha_store/
+```
+
+## Modulos
+
+### `src/genesis/data/`
+
+Responsable de obtener y guardar datos de mercado.
+
+- `market_data_loader.py`
+  Descarga OHLCV desde BingX y lo devuelve como `DataFrame`.
+
+- `dataset_builder.py`
+  Guarda datasets en parquet.
+
+- `providers/bingx_client.py`
+  Cliente para balance, ticker, order book, ordenes, posiciones y modos demo/test.
+
+- `funding_rates.py`
+- `orderbook_stream.py`
+
+Los dos ultimos siguen como placeholders.
+
+### `src/genesis/features/`
+
+Convierte datos crudos en variables cuantitativas.
+
+- `feature_engineering.py`
+  Genera retornos, volatilidad, momentum y features de volumen.
+
+- `indicators.py`
+  Incluye indicadores como SMA, EMA, RSI, MACD, ATR y Bollinger Bands.
+
+- `feature_store.py`
+  Clase simple para guardar y cargar features desde parquet.
+
+### `src/genesis/alpha/`
+
+Es la capa mas madura del proyecto hoy.
+
+- `operators.py`
+  Operadores cuantitativos base.
+
+- `alpha_generator.py`
+  Generacion automatica de alphas.
+
+- `alpha_evaluator.py`
+  Evaluacion con `IC`, `Sharpe` y `MaxDrawdown`.
+
+- `alpha_registry.py`
+  Registro simple para organizar senales.
+
+### `src/genesis/ml/`
+
+Scaffold para entrenamiento, ensemble y prediccion. Aun sin implementacion real.
+
+### `src/genesis/llm/`
+
+Scaffold para capa macro y deteccion de regimen. Aun sin implementacion real.
+
+### `src/genesis/portfolio/`
+
+Scaffold para riesgo y position sizing. Aun sin implementacion real.
+
+### `src/genesis/execution/`
+
+Scaffold para ejecucion en vivo. La integracion real de BingX hoy vive en `src/genesis/data/providers/`.
+
+### `src/genesis/backtest/`
+
+La carpeta ya existe dentro del paquete, pero el ejemplo funcional actual esta en `scripts/run_backtest.py`.
+
+## Scripts principales
+
+- `scripts/run_data_pipeline.py`
+  Descarga BTC/USDT en 4h y lo guarda en `data/raw/`.
+
+- `scripts/run_feature_pipeline.py`
+  Lee el dataset crudo y genera features en `data/feature_store/`.
+
+- `scripts/run_alpha_generation.py`
+  Genera alphas y los guarda en `data/alpha_store/`.
+
+- `scripts/run_alpha_pipeline.py`
+  Genera y evalua alphas.
+
+- `scripts/run_backtest.py`
+  Ejecuta el experimento de backtesting con Backtrader.
+
+- `scripts/check_bingx_connection.py`
+  Valida credenciales, consulta balance, ticker y prueba endpoints privados basicos.
+
+- `scripts/check_bingx_demo.py`
+  Contrasta ticker, Virtual USDT, balance demo, ordenes y posiciones.
+
+- `scripts/check_bingx_demo_order.py`
+  Envia una test order en demo usando el host VST y sin tocar fondos reales.
+
+- `scripts/check_bingx_demo_cycle.py`
+  Ejecuta un ciclo demo completo: balance, limit order demo, verificacion de ordenes/posiciones y cancelacion si aplica.
+
+- `scripts/open_bingx_demo_position.py`
+  Abre una posicion demo real usando una market order.
+
+- `scripts/close_bingx_demo_positions.py`
+  Cierra cualquier posicion demo abierta para el simbolo configurado.
+
+- `scripts/run_demo_trading_loop.py`
+  Ejecuta una pasada completa de demo trading: datos, features, senal, riesgo y plan de ejecucion.
+
+## Flujo real implementado hoy
+
+```text
+BingX OHLCV
+   ->
+scripts/run_data_pipeline.py
+   ->
+data/raw/btc_4h.parquet
+   ->
+scripts/run_feature_pipeline.py
+   ->
+data/feature_store/btc_features_4h.parquet
+   ->
+scripts/run_alpha_generation.py o scripts/run_alpha_pipeline.py
+   ->
+data/alpha_store/generated_alphas.parquet
+   ->
+evaluacion basica de alphas
+```
+
+## Configuracion de entorno
+
+Variables principales en `.env`:
+
+```env
+BINGX_API_KEY=
+BINGX_SECRET=
+
+BINGX_DEFAULT_SYMBOL=BTC/USDT
+BINGX_DEFAULT_TIMEFRAME=4h
+
+BINGX_DEMO_TRADING=false
+BINGX_DEMO_SYMBOL=BTC/USDT:USDT
+BINGX_DEMO_TEST_SIDE=buy
+BINGX_DEMO_TEST_USDT=100
+BINGX_DEMO_OPEN_SIDE=buy
+BINGX_DEMO_OPEN_USDT=100
+BINGX_DEMO_CYCLE_SIDE=buy
+BINGX_DEMO_CYCLE_USDT=100
+BINGX_DEMO_CYCLE_PRICE_OFFSET_PCT=0.2
+
+DEMO_LOOP_EXECUTE=false
+DEMO_LOOP_DATA_SYMBOL=BTC/USDT
+DEMO_LOOP_TRADE_SYMBOL=BTC/USDT:USDT
+DEMO_LOOP_NOTIONAL_USDT=100
+DEMO_LOOP_OHLCV_LIMIT=120
+
+RISK_MAX_POSITION_USDT=100
+RISK_MAX_OPEN_POSITIONS=1
+
+BINGX_ENABLE_RATE_LIMIT=true
+BINGX_TIMEOUT_MS=10000
+```
+
+## Como correr el pipeline
+
+Desde la raiz del proyecto:
+
+```bash
+python scripts/run_data_pipeline.py
+python scripts/run_feature_pipeline.py
+python scripts/run_alpha_pipeline.py
+```
+
+Para el backtest:
+
+```bash
+python scripts/run_backtest.py
+```
+
+Para validar la integracion privada con BingX:
+
+```bash
+python scripts/check_bingx_connection.py
+```
+
+Para inspeccionar demo trading y Virtual USDT:
+
+```bash
+python scripts/check_bingx_demo.py
+```
+
+Para probar una test order demo:
+
+```bash
+python scripts/check_bingx_demo_order.py
+```
+
+Para ejecutar el ciclo demo completo:
+
+```bash
+python scripts/check_bingx_demo_cycle.py
+```
+
+Para abrir una posicion demo:
+
+```bash
+python scripts/open_bingx_demo_position.py
+```
+
+Para cerrar posiciones demo abiertas:
+
+```bash
+python scripts/close_bingx_demo_positions.py
+```
+
+Para correr una pasada del loop demo:
+
+```bash
+python scripts/run_demo_trading_loop.py
+```
+
+## Proximos pasos naturales
+
+- completar `funding_rates.py` y `orderbook_stream.py`
+- fortalecer `feature_store.py`
+- convertir `alpha_registry.py` en un registro real de senales
+- implementar la capa `ml/`
+- mover la logica demo/real a `execution/`
+- construir un backtesting modular dentro de `src/genesis/backtest/`
