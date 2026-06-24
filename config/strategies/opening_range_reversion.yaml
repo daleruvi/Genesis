@@ -1,0 +1,25 @@
+session: ny
+timezone: America/New_York
+session_start: "09:30"
+opening_range_minutes: 15
+entry_start: "09:45"
+entry_end: "11:30"
+time_exit_at: "16:00"
+
+atr_mode: daily
+daily_atr_period: 14
+atr_buffer_mult: 0.25
+min_or_size_vs_atr: 0.05
+max_or_size_vs_atr: 0.60
+min_daily_atr_pct: 0.015
+
+trend_filter: ema
+ema_period: 50
+
+fee_rate: 0.0005
+slippage_rate: 0.0005
+initial_equity: 10000.0
+
+dataset_path: data/raw/btc_usdt_usdt_5m_2025.parquet
+daily_dataset_path: data/raw/btc_usdt_usdt_1d_20241201_20260101.parquet
+output_prefix: opening_range_reversion_ny

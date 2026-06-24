@@ -27,6 +27,7 @@ from genesis.config.settings import (
     ALPHA_STORE_DIR,
     RISK_MAX_OPEN_POSITIONS,
     RISK_MAX_POSITION_USDT,
+    validate_execution_profile,
 )
 from genesis.data.market_data_loader import MarketDataLoader
 from genesis.execution.execution_engine import ExecutionEngine
@@ -54,6 +55,9 @@ def load_research_inputs():
 
 
 def main():
+    if DEMO_LOOP_EXECUTE:
+        validate_execution_profile("demo")
+
     section("Step 1/7 - Demo loop configuration")
     print("Running demo trading loop")
     print(f"Data symbol: {DEMO_LOOP_DATA_SYMBOL}")

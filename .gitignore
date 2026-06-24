@@ -5,7 +5,8 @@ __pycache__/
 
 # Test, coverage, and type-check caches
 .pytest_cache/
-pytest-cache-files-*/
+pytest-cache-files*/
+tests/_tmp_data/
 .coverage
 .coverage.*
 htmlcov/
@@ -47,8 +48,6 @@ desktop.ini
 
 # Local environment and secrets
 .env
-.env.*
-!.env.example
 
 # Local generated operational journals
 data/journals/

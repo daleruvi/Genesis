@@ -49,11 +49,39 @@ def env_float(name: str, default: float) -> float:
     return float(value)
 
 
+def env_optional_int(name: str) -> int | None:
+    value = os.getenv(name)
+    if value is None or value.strip() == "":
+        return None
+    return int(value)
+
+
+def env_optional_float(name: str) -> float | None:
+    value = os.getenv(name)
+    if value is None or value.strip() == "":
+        return None
+    return float(value)
+
+
 def env_str(name: str, default: str) -> str:
     return os.getenv(name, default)
 
 
 _load_dotenv(ENV_FILE)
+
+VALID_GENESIS_PROFILES = {"research", "demo", "live"}
+
+
+def _load_genesis_profile() -> str:
+    profile = env_str("GENESIS_PROFILE", "research").strip().lower()
+    if profile not in VALID_GENESIS_PROFILES:
+        valid = ", ".join(sorted(VALID_GENESIS_PROFILES))
+        raise ValueError(f"Invalid GENESIS_PROFILE={profile!r}. Expected one of: {valid}.")
+    return profile
+
+
+GENESIS_PROFILE = _load_genesis_profile()
+GENESIS_ALLOW_LIVE = env_bool("GENESIS_ALLOW_LIVE", False)
 
 
 TRADING_STYLE = env_str("TRADING_STYLE", "swing").strip().lower()
@@ -103,6 +131,11 @@ BINGX_API_KEY = os.getenv("BINGX_API_KEY")
 BINGX_SECRET = os.getenv("BINGX_SECRET")
 BINGX_DEFAULT_SYMBOL = env_str("BINGX_DEFAULT_SYMBOL", "BTC/USDT")
 BINGX_DEFAULT_TIMEFRAME = env_str("BINGX_DEFAULT_TIMEFRAME", TRADING_DATA_TIMEFRAME)
+POLYGON_PLAN = env_str("POLYGON_PLAN", "basic").strip().lower()
+POLYGON_RATE_LIMIT_CALLS_PER_MINUTE = env_optional_int("POLYGON_RATE_LIMIT_CALLS_PER_MINUTE")
+POLYGON_RATE_LIMIT_SAFETY_MARGIN = env_int("POLYGON_RATE_LIMIT_SAFETY_MARGIN", 1)
+POLYGON_MAX_RETRIES = env_int("POLYGON_MAX_RETRIES", 5)
+POLYGON_BACKOFF_BASE_SECONDS = env_float("POLYGON_BACKOFF_BASE_SECONDS", 15.0)
 BINGX_ENABLE_RATE_LIMIT = env_bool("BINGX_ENABLE_RATE_LIMIT", True)
 BINGX_TIMEOUT_MS = env_int("BINGX_TIMEOUT_MS", 10000)
 BINGX_SANDBOX = env_bool("BINGX_SANDBOX", False)
@@ -189,6 +222,18 @@ ENSEMBLE_MIN_TEST_PROFIT_FACTOR = env_float("ENSEMBLE_MIN_TEST_PROFIT_FACTOR", 1
 ENSEMBLE_MAX_TEST_TURNOVER = env_float("ENSEMBLE_MAX_TEST_TURNOVER", 250.0)
 RISK_MAX_POSITION_USDT = env_float("RISK_MAX_POSITION_USDT", 100.0)
 RISK_MAX_OPEN_POSITIONS = env_int("RISK_MAX_OPEN_POSITIONS", 1)
+
+
+def live_trading_enabled() -> bool:
+    return GENESIS_PROFILE == "live" and GENESIS_ALLOW_LIVE
+
+
+def validate_execution_profile(target: str = "demo") -> None:
+    target = target.strip().lower()
+    if target == "demo" and GENESIS_PROFILE == "live":
+        raise RuntimeError("Demo execution cannot run while GENESIS_PROFILE=live.")
+    if target == "live" and not live_trading_enabled():
+        raise RuntimeError("Live execution requires GENESIS_PROFILE=live and GENESIS_ALLOW_LIVE=true.")
 
 
 def ensure_data_dirs() -> None:

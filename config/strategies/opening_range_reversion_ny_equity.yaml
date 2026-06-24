@@ -1,0 +1,37 @@
+symbol: QQQ
+session: ny_equity
+timezone: America/New_York
+session_start: "09:30"
+opening_range_minutes: 15
+entry_start: "09:45"
+entry_end: "11:30"
+time_exit_at: "16:00"
+
+atr_mode: daily
+daily_atr_period: 14
+atr_buffer_mult: 0.25
+min_or_size_vs_daily_atr: 0.05
+max_or_size_vs_daily_atr: 0.60
+min_daily_atr_pct: 0.0
+
+gap_filter_enabled: false
+min_abs_gap_pct:
+max_abs_gap_pct:
+
+opening_volume_filter_enabled: false
+min_opening_volume_vs_avg:
+opening_volume_avg_sessions: 20
+exclude_earnings_days: false
+
+trend_filter: ema
+ema_period: 50
+
+fee_rate: 0.0001
+slippage_rate: 0.0001
+initial_equity: 10000.0
+
+data_adjusted: true
+decision_profile: market_fit
+dataset_path: data/raw/qqq_5m_2025.parquet
+daily_dataset_path: data/raw/qqq_1d_20241201_20260101.parquet
+output_prefix: opening_range_reversion_ny_equity_qqq

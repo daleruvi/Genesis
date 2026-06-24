@@ -1,0 +1,7 @@
+session_id,session,session_date,invalid_reason,or_bar_count
+ny_equity_2025-04-04,ny_equity,2025-04-04,or_size_above_max,3
+ny_equity_2025-04-07,ny_equity,2025-04-07,or_size_above_max,3
+ny_equity_2025-08-01,ny_equity,2025-08-01,or_size_above_max,3
+ny_equity_2025-09-25,ny_equity,2025-09-25,or_size_above_max,3
+ny_equity_2025-09-26,ny_equity,2025-09-26,or_size_above_max,3
+ny_equity_2025-10-14,ny_equity,2025-10-14,or_size_above_max,3

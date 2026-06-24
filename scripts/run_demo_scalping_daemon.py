@@ -51,6 +51,7 @@ from genesis.config.settings import (
     SIZING_MIN_CONVICTION_SCALE,
     SIZING_MIN_MULTIPLIER,
     SIZING_TARGET_ANNUAL_VOL,
+    validate_execution_profile,
 )
 from genesis.data.market_data_loader import MarketDataLoader
 from genesis.execution.execution_engine import ExecutionEngine
@@ -243,6 +244,9 @@ def build_signal_and_notional(features, rankings, regime_performance):
 
 
 def main():
+    if SCALP_DAEMON_EXECUTE:
+        validate_execution_profile("demo")
+
     section("Scalping daemon boot")
     print(f"Trading style profile: {TRADING_STYLE}")
     print(f"Execute orders: {SCALP_DAEMON_EXECUTE}")

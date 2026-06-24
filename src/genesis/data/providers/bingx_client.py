@@ -1,5 +1,3 @@
-from bingx import BingxSync
-
 from genesis.config.settings import (
     BINGX_API_KEY,
     BINGX_DEMO_TRADING,
@@ -8,6 +6,17 @@ from genesis.config.settings import (
     BINGX_SECRET,
     BINGX_TIMEOUT_MS,
 )
+
+
+def _load_bingx_sync():
+    try:
+        from bingx import BingxSync
+    except ImportError as exc:
+        raise ImportError(
+            "The optional BingX SDK is required to create a real BingX client. "
+            "Install GENESIS with `python -m pip install -e .` or install `bingx`."
+        ) from exc
+    return BingxSync
 
 
 def build_bingx_config(api_key=None, secret=None, public_only=False):
@@ -31,6 +40,7 @@ def build_bingx_config(api_key=None, secret=None, public_only=False):
 
 
 def create_bingx_sync_client(api_key=None, secret=None, demo_trading=None, sandbox=None, public_only=False):
+    BingxSync = _load_bingx_sync()
     use_demo_trading = BINGX_DEMO_TRADING if demo_trading is None else demo_trading
     use_sandbox = BINGX_SANDBOX if sandbox is None else sandbox
 
